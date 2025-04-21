@@ -6,8 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 const CampaignForm = ({ onSubmit, isSubmitting, initialValues }) => {
   const [previewImage, setPreviewImage] = useState(null);
-  
-  // Match categories from the Mongoose schema
+ 
   const categories = [
     'education',
     'medical',
@@ -59,11 +58,9 @@ const CampaignForm = ({ onSubmit, isSubmitting, initialValues }) => {
     onSubmit: (values) => {
       const formData = new FormData();
       
-      // Add simple fields to FormData
       Object.entries(values).forEach(([key, value]) => {
         if (key !== 'image' && key !== 'beneficiaries' && key !== 'location' && 
             value !== null && value !== undefined) {
-          // Handle date objects specially
           if (value instanceof Date) {
             formData.append(key, value.toISOString());
           } else {
@@ -72,12 +69,11 @@ const CampaignForm = ({ onSubmit, isSubmitting, initialValues }) => {
         }
       });
       
-      // Handle image
+      
       if (values.image) {
         formData.append('image', values.image);
       }
       
-      // Handle beneficiaries array
       values.beneficiaries.forEach((beneficiary, index) => {
         if (beneficiary.trim()) {
           formData.append(`beneficiaries[${index}]`, beneficiary);

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { useAuth } from "./context/AuthContext";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
@@ -17,10 +17,9 @@ import Unauthorized from "./pages/errors/Unauthorized";
 import NotFound from "./pages/errors/NotFound";
 import NewCampaign from "./pages/admin/NewCampaign";
 
-// Layout
-import AdminLayout from "./layouts/AdminLayout";
+import { Navigation } from "./components/common/Navigation";
 
-// Protected Route Component
+
 const ProtectedRoute = ({ children, allowedRoles = ["admin", "manager"] }) => {
   const { user, loading } = useAuth();
 
@@ -28,6 +27,7 @@ const ProtectedRoute = ({ children, allowedRoles = ["admin", "manager"] }) => {
     return <LoadingSpinner fullScreen />;
   }
 
+  // ✅ Redirect unauthenticated users to login first
   if (!user) {
     return (
       <Navigate
@@ -38,6 +38,7 @@ const ProtectedRoute = ({ children, allowedRoles = ["admin", "manager"] }) => {
     );
   }
 
+  // ✅ Then check role after confirming user is logged in
   if (!allowedRoles.includes(user.role)) {
     return (
       <Navigate
@@ -51,10 +52,25 @@ const ProtectedRoute = ({ children, allowedRoles = ["admin", "manager"] }) => {
   return children;
 };
 
-// Role-Specific Route Wrapper
+
+
 const AdminOnlyRoute = ({ children }) => (
   <ProtectedRoute allowedRoles={["admin"]}>{children}</ProtectedRoute>
 );
+
+
+const AdminLayout = () => {
+  return (
+    <div className="flex h-screen bg-gray-100">
+      <Navigation />
+      <div className="ml-64 flex-1 overflow-auto">
+        <main className="p-6">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+};
 
 const App = () => {
   return (

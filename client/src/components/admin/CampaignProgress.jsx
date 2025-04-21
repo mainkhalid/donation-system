@@ -15,6 +15,12 @@ const CampaignProgress = ({
     return 'Active';
   };
 
+  // Helper function to safely format category
+  const formatCategory = (category) => {
+    if (!category) return 'Unknown';
+    return category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
+  };
+
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <table className="w-full">
@@ -29,77 +35,85 @@ const CampaignProgress = ({
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {campaigns.map((campaign) => (
-            <tr key={campaign._id} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap">
-                <Link
-                  to={`/admin/campaigns/${campaign._id}`}
-                  className="text-blue-600 hover:underline font-medium"
-                >
-                  {campaign.title}
-                </Link>
-                <p className="text-sm text-gray-500 mt-1">
-                  {campaign.category}
-                </p>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  calculateStatus(campaign.startDate, campaign.endDate) === 'Active' 
-                    ? 'bg-green-100 text-green-800' 
-                    : calculateStatus(campaign.startDate, campaign.endDate) === 'Upcoming'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {calculateStatus(campaign.startDate, campaign.endDate)}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {currencyFormat(campaign.targetAmount)}
-              </td>
-              <td className="px-6 py-4">
-                <div className="flex items-center">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                    <div
-                      className="h-2.5 rounded-full"
-                      style={{ 
-                        width: `${campaign.progressPercentage}%`,
-                        backgroundColor: campaign.progressPercentage >= 100 
-                          ? '#10B981' // Green for completed
-                          : '#3B82F6' // Blue for in-progress
-                      }}
-                    />
-                  </div>
-                  <span className="text-sm text-gray-500">
-                    {campaign.progressPercentage}%
-                  </span>
-                </div>
-                <div className="text-xs text-gray-500 mt-1">
-                  {currencyFormat(campaign.currentAmount)} raised
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {formatDate(campaign.endDate)}
-              </td>
-              {showActions && (
+          {campaigns.length > 0 ? (
+            campaigns.map((campaign) => (
+              <tr key={campaign._id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => onEdit(campaign._id)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => onDelete(campaign._id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Delete
-                    </button>
+                  <Link
+                    to={`/admin/campaigns/${campaign._id}`}
+                    className="text-blue-600 hover:underline font-medium"
+                  >
+                    {campaign.title}
+                  </Link>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {formatCategory(campaign.category)}
+                  </p>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    calculateStatus(campaign.startDate, campaign.endDate) === 'Active' 
+                      ? 'bg-green-100 text-green-800' 
+                      : calculateStatus(campaign.startDate, campaign.endDate) === 'Upcoming'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {calculateStatus(campaign.startDate, campaign.endDate)}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {currencyFormat(campaign.targetAmount)}
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center">
+                    <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
+                      <div
+                        className="h-2.5 rounded-full"
+                        style={{ 
+                          width: `${campaign.progressPercentage || 0}%`,
+                          backgroundColor: (campaign.progressPercentage || 0) >= 100 
+                            ? '#10B981' // Green for completed
+                            : '#3B82F6' // Blue for in-progress
+                        }}
+                      />
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      {campaign.progressPercentage || 0}%
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {currencyFormat(campaign.currentAmount || 0)} raised
                   </div>
                 </td>
-              )}
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {formatDate(campaign.endDate)}
+                </td>
+                {showActions && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => onEdit(campaign._id)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => onDelete(campaign._id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={showActions ? 6 : 5} className="px-6 py-4 text-center text-gray-500">
+                No campaigns found
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

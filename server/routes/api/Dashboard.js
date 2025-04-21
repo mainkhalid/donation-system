@@ -31,19 +31,19 @@ router.get('/', auth, async (req, res) => {
           _id: '1', 
           amount: 100, 
           createdAt: '2025-04-15T10:30:00.000Z', 
-          donor: { name: 'John Doe', email: 'john@example.com' } 
+          donor: { name: 'Janice janny', email: 'janice@gmail.com' } 
         },
         { 
           _id: '2', 
           amount: 250, 
           createdAt: '2025-04-12T14:45:00.000Z', 
-          donor: { name: 'Jane Smith', email: 'jane@example.com' } 
+          donor: { name: 'Jane Muthusi', email: 'muthusijane@gmail.com' } 
         },
         { 
           _id: '3', 
           amount: 500, 
           createdAt: '2025-04-10T09:15:00.000Z', 
-          donor: { name: 'Bob Johnson', email: 'bob@example.com' } 
+          donor: { name: 'khalid main', email: 'khalid051@gmail.com' } 
         }
       ],
       campaigns: [

@@ -28,10 +28,10 @@ const NewCampaign = () => {
       if (imageFile && imageFile instanceof File) {
         const cloudinaryData = new FormData();
         cloudinaryData.append('file', imageFile);
-        cloudinaryData.append('upload_preset', 'your_upload_preset'); // Replace with your Cloudinary upload preset
+        cloudinaryData.append('upload_preset', 'campaign_image'); 
         
         const cloudinaryResponse = await fetch(
-          'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload', // Replace with your Cloudinary cloud name
+          'https://api.cloudinary.com/v1_1/djy5khmqn/image/upload', 
           {
             method: 'POST',
             body: cloudinaryData,
@@ -68,6 +68,7 @@ const NewCampaign = () => {
         detailedStory: formData.get('detailedStory'),
         category: formData.get('category'),
         targetAmount: parseFloat(formData.get('targetAmount')),
+        currentAmount: 0, // Initialize with 0
         startDate: new Date(formData.get('startDate')),
         endDate: new Date(formData.get('endDate')),
         isActive: formData.get('isActive') === 'true',
@@ -82,7 +83,10 @@ const NewCampaign = () => {
       // Submit campaign to your API
       const response = await api.post('/campaigns', campaignData);
       
-      navigate(`/admin/campaigns/${response.data._id}`);
+      // Navigate with state to trigger refresh on campaigns page
+      navigate('/admin/campaigns', { 
+        state: { refreshCampaigns: true } 
+      });
     } catch (err) {
       console.error('Error creating campaign:', err);
       setError(err.response?.data?.message || 'Failed to create campaign');

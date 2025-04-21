@@ -6,7 +6,79 @@ const asyncHandler = require('../middleware/async');
 // @route   GET /api/v1/campaigns
 // @access  Public
 exports.getCampaigns = asyncHandler(async (req, res, next) => {
-  res.status(200).json(res.advancedResults);
+  try {
+    // Build query object
+    const queryObj = {};
+    
+    // Filter by creator if specified
+    if (req.query.createdBy) {
+      queryObj.createdBy = req.query.createdBy;
+    }
+    
+    // Filter by category if specified
+    if (req.query.category) {
+      queryObj.category = req.query.category;
+    }
+    
+    // Filter by active status
+    if (req.query.isActive) {
+      queryObj.isActive = req.query.isActive === 'true';
+    }
+    
+    // Filter by featured status
+    if (req.query.isFeatured) {
+      queryObj.isFeatured = req.query.isFeatured === 'true';
+    }
+    
+    // Build sort object
+    let sortBy = '-createdAt'; // Default sort
+    if (req.query.sort) {
+      sortBy = req.query.sort;
+    }
+    
+    // Handle pagination
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const startIndex = (page - 1) * limit;
+    
+    // Execute query
+    const campaigns = await Campaign.find(queryObj)
+      .sort(sortBy)
+      .skip(startIndex)
+      .limit(limit);
+    
+    // Get total count for pagination
+    const total = await Campaign.countDocuments(queryObj);
+    
+    // Pagination result
+    const pagination = {};
+    
+    if (startIndex + limit < total) {
+      pagination.next = {
+        page: page + 1,
+        limit
+      };
+    }
+    
+    if (startIndex > 0) {
+      pagination.prev = {
+        page: page - 1,
+        limit
+      };
+    }
+    
+    console.log(`Found ${campaigns.length} campaigns with query:`, queryObj);
+    
+    res.status(200).json({
+      success: true,
+      count: campaigns.length,
+      pagination,
+      data: campaigns
+    });
+  } catch (error) {
+    console.error('Error in getCampaigns:', error);
+    next(new ErrorResponse('Error retrieving campaigns', 500));
+  }
 });
 
 // @desc    Get single campaign
