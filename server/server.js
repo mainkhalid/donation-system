@@ -64,9 +64,7 @@ app.use(hpp());
 
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? `https://donation-system-1.onrender.com`
-    : 'http://localhost:5173',
+  origin: ['https://donation-system-1.onrender.com', 'http://localhost:5173'],
   credentials: true,
 }));
 
